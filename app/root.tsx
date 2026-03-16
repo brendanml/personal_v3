@@ -4,12 +4,19 @@ import {
     Meta,
     Outlet,
     Scripts,
+    useLoaderData,
 } from "react-router"
 import AppLayout from "./components/AppLayout"
 import { ThemeProvider } from "./lib/ThemeContext"
+import { getProfile } from "./utils/data.server"
 
 import type { Route } from "./+types/root"
 import "./app.css"
+import duckFavi from "./assets/duck-favi.png"
+
+export async function loader(_: Route.LoaderArgs) {
+    return { profile: await getProfile() }
+}
 
 export const meta: Route.MetaFunction = () => [{ title: "Brendan Lynch" }]
 
@@ -28,6 +35,7 @@ export const links: Route.LinksFunction = () => [
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Jersey+10&display=swap",
     },
+    { rel: "icon", type: "image/png", href: duckFavi },
 ]
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -56,9 +64,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+    const { profile } = useLoaderData<typeof loader>()
     return (
         <ThemeProvider>
-            <AppLayout>
+            <AppLayout profile={profile}>
                 <Outlet />
             </AppLayout>
         </ThemeProvider>

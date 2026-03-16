@@ -1,6 +1,9 @@
 import { useState } from "react"
+import { useLoaderData, Link } from "react-router"
+import type { Route } from "./+types/books"
 import Page from "~/components/Page"
-import { getBooks } from "~/utils/db"
+import { getBooks } from "~/utils/data.server"
+
 import {
     Table,
     TableBody,
@@ -10,20 +13,32 @@ import {
     TableRow,
 } from "~/components/ui/table"
 
+export async function loader(_: Route.LoaderArgs) {
+    return { books: await getBooks() }
+}
+
 type SortKey = "date" | "progress"
 type SortDir = "asc" | "desc"
 
 export default function Books() {
+    const { books: allBooks } = useLoaderData<typeof loader>()
     const [sortKey, setSortKey] = useState<SortKey>("date")
     const [sortDir, setSortDir] = useState<SortDir>("desc")
-
-    const allBooks = getBooks()
     const sorted = [...allBooks].sort((a, b) => {
         const dir = sortDir === "asc" ? 1 : -1
         if (sortKey === "date") {
-            return ((a.date ?? "") < (b.date ?? "") ? -1 : 1) * dir
+            const dateCmp =
+                (a.date ?? "") < (b.date ?? "")
+                    ? -1
+                    : (a.date ?? "") > (b.date ?? "")
+                      ? 1
+                      : 0
+            if (dateCmp !== 0) return dateCmp * dir
+        } else {
+            const progressCmp = a.progress - b.progress
+            if (progressCmp !== 0) return progressCmp * dir
         }
-        return (a.progress - b.progress) * dir
+        return (a.title ?? "").localeCompare(b.title ?? "")
     })
 
     const toggleSort = (key: SortKey) => {
@@ -92,14 +107,12 @@ export default function Books() {
                                     <div className="flex flex-col gap-0.5">
                                         <span>{book.shortTitle}</span>
                                         {book.article && (
-                                            <a
-                                                href={book.article}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
+                                            <Link
+                                                to={book.article}
                                                 className="text-xs text-muted-foreground underline font-normal"
                                             >
                                                 read article
-                                            </a>
+                                            </Link>
                                         )}
                                     </div>
                                 </TableCell>
@@ -116,14 +129,12 @@ export default function Books() {
                                     {book.article && (
                                         <>
                                             {" "}
-                                            <a
-                                                href={book.article}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
+                                            <Link
+                                                to={book.article}
                                                 className="underline"
                                             >
-                                                read more...
-                                            </a>
+                                                read more
+                                            </Link>
                                         </>
                                     )}
                                 </TableCell>
@@ -131,13 +142,17 @@ export default function Books() {
                                     <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
                                         <div
                                             className="h-full rounded-full bg-pop-text transition-all duration-300"
-                                            style={{ width: `${book.progress}%` }}
+                                            style={{
+                                                width: `${book.progress}%`,
+                                            }}
                                         />
                                     </div>
                                 </TableCell>
                                 <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
                                     {book.date
-                                        ? new Date(book.date).toLocaleDateString("en-US", {
+                                        ? new Date(
+                                              book.date,
+                                          ).toLocaleDateString("en-US", {
                                               year: "numeric",
                                               timeZone: "UTC",
                                           })

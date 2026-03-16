@@ -5,7 +5,7 @@ import LightModeIcon from "@mui/icons-material/LightMode"
 import MenuIcon from "@mui/icons-material/Menu"
 import { Button } from "~/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "~/components/ui/sheet"
-import { glassStyles } from "~/lib/styles"
+import { glassBaseStyles, glassStyles, glassInactiveStyles, glassClickable } from "~/lib/styles"
 import FixedContentRow from "~/components/FixedContentRow"
 import { navLinksFor, type NavLink } from "~/lib/navLinks"
 
@@ -27,15 +27,11 @@ const DesktopNav = ({ links }: { links: NavLink[] }) => {
             innerClassName="justify-end"
         >
             <div
-                className={`pointer-events-auto flex items-center px-2 py-1 transition-[background-color,border-color,box-shadow,backdrop-filter] duration-150 ${
-                    scrolled
-                        ? glassStyles
-                        : "bg-transparent backdrop-blur-none border border-transparent shadow-none rounded-2xl"
-                }`}
+                className={`${glassBaseStyles} ${scrolled ? glassStyles : glassInactiveStyles}`}
             >
                 {links.map((link) => (
                     <Button
-                        className="[user-drag:none]"
+                        className={`[user-drag:none] ${glassClickable}`}
                         key={link.href}
                         variant="ghost"
                         asChild
@@ -54,7 +50,7 @@ const DesktopNav = ({ links }: { links: NavLink[] }) => {
                     aria-label="Toggle dark mode"
                     variant="ghost"
                     size="icon"
-                    className="cursor-pointer [user-drag:none] select-none"
+                    className={`cursor-pointer [user-drag:none] select-none ${glassClickable}`}
                 >
                     {colorMode === "dark" ? (
                         <LightModeIcon fontSize="small" />

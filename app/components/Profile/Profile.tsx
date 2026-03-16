@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react"
-import { profile } from "~/utils/db"
 import { usePersona } from "~/lib/ThemeContext"
+import type { Profile as ProfileType } from "~/types"
 
-const Profile = () => {
-    const about = usePersona(profile.about)
-    const tag = usePersona(profile.tag)
+const Profile = ({ profile }: { profile: ProfileType | null }) => {
+    const about = usePersona(profile?.about ?? { fun: "", technical: "" })
+    const tag = usePersona(profile?.tag ?? { fun: "", technical: "" })
     const [sticky, setSticky] = useState(true)
     const [sections, setSections] = useState<{ id: string; label: string }[]>(
         [],
@@ -103,7 +103,7 @@ const Profile = () => {
                                     className={`rounded-full shrink-0 transition-all duration-300 ${active ? "w-2 h-2 bg-pop border border-pop-text" : "w-1.5 h-1.5 bg-muted-foreground/30"}`}
                                 />
                                 <span
-                                    className={`text-sm transition-all duration-300 ${active ? "text-pop-text" : "text-muted-foreground/40"}`}
+                                    className={`text-sm transition-all duration-300 ${!active && "hover:text-foreground"} ${active ? "text-pop-text" : "text-muted-foreground/40"}`}
                                 >
                                     {label}
                                 </span>

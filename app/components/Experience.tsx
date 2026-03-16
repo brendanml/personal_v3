@@ -1,11 +1,7 @@
 import ExperienceSection from "~/components/ExperienceSection"
-import { getExperiences } from "~/utils/db"
-import { useTheme } from "~/lib/ThemeContext"
+import type { ExperienceSection as ExperienceSectionType } from "~/types"
 
-export default function Experience() {
-    const { personaMode } = useTheme()
-    const sections = getExperiences(personaMode)
-
+export default function Experience({ sections }: { sections: ExperienceSectionType[] }) {
     return (
         <div
             id="experience"
