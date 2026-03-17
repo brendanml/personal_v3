@@ -86,3 +86,49 @@ export async function updateBook(id, data) {
     })
     return res.json()
 }
+
+export async function getProjects() {
+    const res = await fetch(`${BASE}/projects`)
+    return res.json()
+}
+
+export async function getProject(id) {
+    const res = await fetch(`${BASE}/projects/${id}`)
+    return res.json()
+}
+
+export async function createProject(data) {
+    const res = await fetch(`${BASE}/projects`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+    })
+    return res.json()
+}
+
+export async function updateProject(id, data) {
+    const res = await fetch(`${BASE}/projects/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+    })
+    return res.json()
+}
+
+export async function deleteProject(id) {
+    await fetch(`${BASE}/projects/${id}`, { method: "DELETE" })
+}
+
+export async function getProfile() {
+    const res = await fetch(`${BASE}/profile`)
+    return res.json()
+}
+
+export async function updateProfile(data) {
+    const res = await fetch(`${BASE}/profile`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+    })
+    return res.json()
+}

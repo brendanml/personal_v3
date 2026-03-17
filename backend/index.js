@@ -15,6 +15,8 @@ const {
 const Article = require("./models/Article")
 const ArticleType = require("./models/ArticleType")
 const Book = require("./models/Book")
+const Project = require("./models/Project")
+const Profile = require("./models/Profile")
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -96,8 +98,46 @@ app.get("/jobs", async (req, res) => {
 })
 
 app.get("/projects", async (req, res) => {
-    const projects = await getProjects()
+    const projects = await Project.find({}).lean()
     res.json(projects)
+})
+
+app.get("/projects/:id", async (req, res) => {
+    const project = await Project.findById(req.params.id).lean()
+    if (!project) return res.status(404).json({ error: "Not found" })
+    res.json(project)
+})
+
+app.post("/projects", async (req, res) => {
+    try {
+        const project = await Project.create(req.body)
+        res.status(201).json(project)
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
+
+app.put("/projects/:id", async (req, res) => {
+    try {
+        const project = await Project.findByIdAndUpdate(req.params.id, req.body, {
+            returnDocument: "after",
+            runValidators: true,
+        })
+        if (!project) return res.status(404).json({ error: "Not found" })
+        res.json(project)
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
+
+app.delete("/projects/:id", async (req, res) => {
+    try {
+        const project = await Project.findByIdAndDelete(req.params.id)
+        if (!project) return res.status(404).json({ error: "Not found" })
+        res.status(204).end()
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
 })
 
 app.get("/certifications", async (req, res) => {
@@ -108,6 +148,19 @@ app.get("/certifications", async (req, res) => {
 app.get("/profile", async (req, res) => {
     const profile = await getProfile()
     res.json(profile)
+})
+
+app.put("/profile", async (req, res) => {
+    try {
+        const profile = await Profile.findOneAndUpdate({}, req.body, {
+            returnDocument: "after",
+            runValidators: true,
+            upsert: true,
+        })
+        res.json(profile)
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
 })
 
 app.get("/name", async (req, res) => {

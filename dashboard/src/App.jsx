@@ -3,6 +3,9 @@ import Articles from "./pages/Articles"
 import ArticleForm from "./pages/ArticleForm"
 import Tags from "./pages/Tags"
 import Books from "./pages/Books"
+import Projects from "./pages/Projects"
+import ProjectForm from "./pages/ProjectForm"
+import Profile from "./pages/Profile"
 import { cn } from "./lib/utils"
 
 export default function App() {
@@ -12,7 +15,20 @@ export default function App() {
                 <div className="text-xs font-semibold text-muted-foreground px-2.5 mb-4 tracking-wide">
                     Dashboard
                 </div>
-                <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground px-2.5 mb-1">
+                <NavLink
+                    to="/profile"
+                    className={({ isActive }) =>
+                        cn(
+                            "block px-2.5 py-1.5 rounded-md text-sm transition-colors",
+                            isActive
+                                ? "bg-secondary text-foreground"
+                                : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                        )
+                    }
+                >
+                    Profile
+                </NavLink>
+                <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground px-2.5 mb-1 mt-3">
                     Content
                 </div>
                 <NavLink
@@ -54,6 +70,19 @@ export default function App() {
                 >
                     Books
                 </NavLink>
+                <NavLink
+                    to="/projects"
+                    className={({ isActive }) =>
+                        cn(
+                            "block px-2.5 py-1.5 rounded-md text-sm transition-colors",
+                            isActive
+                                ? "bg-secondary text-foreground"
+                                : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                        )
+                    }
+                >
+                    Projects
+                </NavLink>
             </aside>
             <main className="flex-1 p-8">
                 <Routes>
@@ -63,6 +92,10 @@ export default function App() {
                     <Route path="/articles/:id/edit" element={<ArticleForm />} />
                     <Route path="/tags" element={<Tags />} />
                     <Route path="/books" element={<Books />} />
+                    <Route path="/projects" element={<Projects />} />
+                    <Route path="/projects/new" element={<ProjectForm />} />
+                    <Route path="/projects/:id/edit" element={<ProjectForm />} />
+                    <Route path="/profile" element={<Profile />} />
                 </Routes>
             </main>
         </div>

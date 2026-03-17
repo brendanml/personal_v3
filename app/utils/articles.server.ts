@@ -1,2 +1,2 @@
-export type { ArticleMeta, ArticleDoc } from "./data.server"
-export { getAllArticles, getArticle, createArticle, getArticleForEdit, updateArticle } from "./data.server"
+export type { ArticleMeta } from "./data.server"
+export { getAllArticles, getArticle } from "./data.server"
