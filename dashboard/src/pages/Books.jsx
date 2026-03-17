@@ -1,13 +1,33 @@
 import { useEffect, useState, useRef } from "react"
-import { getBooks, searchBooks, createBook, deleteBook, updateBook, getArticles } from "../api"
+import {
+    getBooks,
+    searchBooks,
+    createBook,
+    deleteBook,
+    updateBook,
+    getArticles,
+} from "../api"
 import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
 import { Label } from "../components/ui/label"
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "../components/ui/table"
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableHead,
+    TableRow,
+    TableCell,
+} from "../components/ui/table"
 
 const PERSONAS = ["fun", "technical"]
 
-const emptyForm = { shortTitle: "", thoughts: "", progress: 0, persona: "fun", date: "" }
+const emptyForm = {
+    shortTitle: "",
+    thoughts: "",
+    progress: 0,
+    persona: "fun",
+    date: "",
+}
 
 function useDebounce(value, delay) {
     const [debounced, setDebounced] = useState(value)
@@ -27,7 +47,11 @@ function SelectField({ label, value, onChange, options }) {
                 value={value}
                 onChange={onChange}
             >
-                {options.map((o) => <option key={o} value={o}>{o}</option>)}
+                {options.map((o) => (
+                    <option key={o} value={o}>
+                        {o}
+                    </option>
+                ))}
             </select>
         </div>
     )
@@ -37,14 +61,12 @@ export default function Books() {
     const [books, setBooks] = useState([])
     const [articles, setArticles] = useState([])
 
-    // Add flow
     const [query, setQuery] = useState("")
     const [suggestions, setSuggestions] = useState([])
     const [searching, setSearching] = useState(false)
     const [selected, setSelected] = useState(null)
     const [addForm, setAddForm] = useState(emptyForm)
 
-    // Edit flow
     const [editingBook, setEditingBook] = useState(null)
     const [editForm, setEditForm] = useState({})
 
@@ -59,12 +81,15 @@ export default function Books() {
     }, [])
 
     useEffect(() => {
-        if (!debouncedQuery.trim()) { setSuggestions([]); return }
+        if (!debouncedQuery.trim()) {
+            setSuggestions([])
+            return
+        }
         setSearching(true)
-        searchBooks(debouncedQuery).then(setSuggestions).finally(() => setSearching(false))
+        searchBooks(debouncedQuery)
+            .then(setSuggestions)
+            .finally(() => setSearching(false))
     }, [debouncedQuery])
-
-    // ── Add ──────────────────────────────────────────────────────────────────
 
     function handleSelect(result) {
         setSelected(result)
@@ -105,8 +130,6 @@ export default function Books() {
         }
     }
 
-    // ── Edit ─────────────────────────────────────────────────────────────────
-
     function handleEdit(book) {
         setEditingBook(book)
         setEditForm({
@@ -142,7 +165,9 @@ export default function Books() {
                 date: editForm.date || undefined,
             })
             if (updated.error) throw new Error(updated.error)
-            setBooks((prev) => prev.map((b) => b._id === updated._id ? updated : b))
+            setBooks((prev) =>
+                prev.map((b) => (b._id === updated._id ? updated : b)),
+            )
             handleEditCancel()
         } catch (err) {
             setError(err.message)
@@ -151,14 +176,10 @@ export default function Books() {
         }
     }
 
-    // ── Delete ───────────────────────────────────────────────────────────────
-
     async function handleDelete(id) {
         await deleteBook(id)
         setBooks((prev) => prev.filter((b) => b._id !== id))
     }
-
-    // ── Render ───────────────────────────────────────────────────────────────
 
     return (
         <div>
@@ -170,13 +191,18 @@ export default function Books() {
             {!selected && !editingBook && (
                 <div className="relative max-w-md mb-8" ref={searchRef}>
                     <Input
-                        placeholder="Search Open Library…"
+                        placeholder="Search for books..."
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                     />
-                    {(suggestions.length > 0 || searching) && (
+                    {(suggestions.length > 0 || query) && (
                         <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-md shadow-lg z-10 overflow-hidden">
-                            {searching && <div className="px-3 py-2 text-sm text-muted-foreground">Searching…</div>}
+                            {(searching ||
+                                (query.trim() && !suggestions.length)) && (
+                                <div className="px-3 py-2 text-sm text-muted-foreground">
+                                    Searching…
+                                </div>
+                            )}
                             {suggestions.map((s) => (
                                 <button
                                     key={s.olKey}
@@ -184,13 +210,23 @@ export default function Books() {
                                     className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-secondary transition-colors"
                                     onClick={() => handleSelect(s)}
                                 >
-                                    {s.cover
-                                        ? <img src={s.cover} alt="" className="w-8 h-11 object-cover rounded-sm shrink-0 bg-muted" />
-                                        : <div className="w-8 h-11 rounded-sm bg-muted shrink-0" />
-                                    }
+                                    {s.cover ? (
+                                        <img
+                                            src={s.cover}
+                                            alt=""
+                                            className="w-8 h-11 object-cover rounded-sm shrink-0 bg-muted"
+                                        />
+                                    ) : (
+                                        <div className="w-8 h-11 rounded-sm bg-muted shrink-0" />
+                                    )}
                                     <div className="flex flex-col min-w-0">
-                                        <span className="text-sm font-medium truncate">{s.title}</span>
-                                        <span className="text-xs text-muted-foreground">{s.author}{s.year ? ` · ${s.year}` : ""}</span>
+                                        <span className="text-sm font-medium truncate">
+                                            {s.title}
+                                        </span>
+                                        <span className="text-xs text-muted-foreground">
+                                            {s.author}
+                                            {s.year ? ` · ${s.year}` : ""}
+                                        </span>
                                     </div>
                                 </button>
                             ))}
@@ -201,96 +237,251 @@ export default function Books() {
 
             {/* Add form */}
             {selected && (
-                <form onSubmit={handleAddSave} className="max-w-lg mb-8 p-4 border border-border rounded-lg bg-card flex flex-col gap-4">
+                <form
+                    onSubmit={handleAddSave}
+                    className="max-w-lg mb-8 p-4 border border-border rounded-lg bg-card flex flex-col gap-4"
+                >
                     <div className="flex items-center gap-3">
-                        {selected.cover
-                            ? <img src={selected.cover} alt="" className="w-12 h-16 object-cover rounded-sm shrink-0 bg-muted" />
-                            : <div className="w-12 h-16 rounded-sm bg-muted shrink-0" />
-                        }
+                        {selected.cover ? (
+                            <img
+                                src={selected.cover}
+                                alt=""
+                                className="w-12 h-16 object-cover rounded-sm shrink-0 bg-muted"
+                            />
+                        ) : (
+                            <div className="w-12 h-16 rounded-sm bg-muted shrink-0" />
+                        )}
                         <div>
-                            <p className="text-sm font-medium">{selected.title}</p>
-                            <p className="text-xs text-muted-foreground">{selected.author}{selected.year ? ` · ${selected.year}` : ""}</p>
+                            <p className="text-sm font-medium">
+                                {selected.title}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                                {selected.author}
+                                {selected.year ? ` · ${selected.year}` : ""}
+                            </p>
                         </div>
                     </div>
 
                     <div className="flex gap-4">
                         <div className="flex flex-col gap-1.5 flex-1">
                             <Label>Short title</Label>
-                            <Input value={addForm.shortTitle} onChange={(e) => setAddForm((p) => ({ ...p, shortTitle: e.target.value }))} required />
+                            <Input
+                                value={addForm.shortTitle}
+                                onChange={(e) =>
+                                    setAddForm((p) => ({
+                                        ...p,
+                                        shortTitle: e.target.value,
+                                    }))
+                                }
+                                required
+                            />
                         </div>
                         <div className="flex flex-col gap-1.5 w-24">
                             <Label>Progress %</Label>
-                            <Input type="number" min={0} max={100} value={addForm.progress} onChange={(e) => setAddForm((p) => ({ ...p, progress: e.target.value }))} required />
+                            <Input
+                                type="number"
+                                min={0}
+                                max={100}
+                                value={addForm.progress}
+                                onChange={(e) =>
+                                    setAddForm((p) => ({
+                                        ...p,
+                                        progress: e.target.value,
+                                    }))
+                                }
+                                required
+                            />
                         </div>
                     </div>
 
                     <div className="flex gap-4">
-                        <SelectField label="Persona" value={addForm.persona} onChange={(e) => setAddForm((p) => ({ ...p, persona: e.target.value }))} options={PERSONAS} />
+                        <SelectField
+                            label="Persona"
+                            value={addForm.persona}
+                            onChange={(e) =>
+                                setAddForm((p) => ({
+                                    ...p,
+                                    persona: e.target.value,
+                                }))
+                            }
+                            options={PERSONAS}
+                        />
                         <div className="flex flex-col gap-1.5 flex-1">
                             <Label>Date finished</Label>
-                            <Input type="date" value={addForm.date} onChange={(e) => setAddForm((p) => ({ ...p, date: e.target.value }))} />
+                            <Input
+                                type="date"
+                                value={addForm.date}
+                                onChange={(e) =>
+                                    setAddForm((p) => ({
+                                        ...p,
+                                        date: e.target.value,
+                                    }))
+                                }
+                            />
                         </div>
                     </div>
 
                     <div className="flex flex-col gap-1.5">
                         <Label>Thoughts</Label>
-                        <Input value={addForm.thoughts} onChange={(e) => setAddForm((p) => ({ ...p, thoughts: e.target.value }))} placeholder="One-line take…" />
+                        <Input
+                            value={addForm.thoughts}
+                            onChange={(e) =>
+                                setAddForm((p) => ({
+                                    ...p,
+                                    thoughts: e.target.value,
+                                }))
+                            }
+                            placeholder="One-line take…"
+                        />
                     </div>
 
-                    {error && <p className="text-sm text-destructive">{error}</p>}
+                    {error && (
+                        <p className="text-sm text-destructive">{error}</p>
+                    )}
 
                     <div className="flex gap-3">
-                        <Button type="submit" className="bg-pop-text text-background hover:bg-pop-text/90 font-semibold" disabled={saving}>
+                        <Button
+                            type="submit"
+                            className="bg-pop-text text-background hover:bg-pop-text/90 font-semibold"
+                            disabled={saving}
+                        >
                             {saving ? "Saving…" : "Add book"}
                         </Button>
-                        <Button type="button" variant="outline" onClick={handleAddCancel}>Cancel</Button>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={handleAddCancel}
+                        >
+                            Cancel
+                        </Button>
                     </div>
                 </form>
             )}
 
             {/* Edit form */}
             {editingBook && (
-                <form onSubmit={handleEditSave} className="max-w-lg mb-8 p-4 border border-border rounded-lg bg-card flex flex-col gap-4">
-                    <p className="text-sm font-medium text-muted-foreground">Editing book</p>
+                <form
+                    onSubmit={handleEditSave}
+                    className="max-w-lg mb-8 p-4 border border-border rounded-lg bg-card flex flex-col gap-4"
+                >
+                    <p className="text-sm font-medium text-muted-foreground">
+                        Editing book
+                    </p>
 
                     <div className="flex gap-4">
                         <div className="flex flex-col gap-1.5 flex-1">
                             <Label>Title</Label>
-                            <Input value={editForm.title} onChange={(e) => setEditForm((p) => ({ ...p, title: e.target.value }))} required />
+                            <Input
+                                value={editForm.title}
+                                onChange={(e) =>
+                                    setEditForm((p) => ({
+                                        ...p,
+                                        title: e.target.value,
+                                    }))
+                                }
+                                required
+                            />
                         </div>
                     </div>
 
                     <div className="flex gap-4">
                         <div className="flex flex-col gap-1.5 flex-1">
                             <Label>Short title</Label>
-                            <Input value={editForm.shortTitle} onChange={(e) => setEditForm((p) => ({ ...p, shortTitle: e.target.value }))} required />
+                            <Input
+                                value={editForm.shortTitle}
+                                onChange={(e) =>
+                                    setEditForm((p) => ({
+                                        ...p,
+                                        shortTitle: e.target.value,
+                                    }))
+                                }
+                                required
+                            />
                         </div>
                         <div className="flex flex-col gap-1.5 flex-1">
                             <Label>Author</Label>
-                            <Input value={editForm.author} onChange={(e) => setEditForm((p) => ({ ...p, author: e.target.value }))} required />
+                            <Input
+                                value={editForm.author}
+                                onChange={(e) =>
+                                    setEditForm((p) => ({
+                                        ...p,
+                                        author: e.target.value,
+                                    }))
+                                }
+                                required
+                            />
                         </div>
                     </div>
 
                     <div className="flex gap-4">
                         <div className="flex flex-col gap-1.5 w-24">
                             <Label>Progress %</Label>
-                            <Input type="number" min={0} max={100} value={editForm.progress} onChange={(e) => setEditForm((p) => ({ ...p, progress: e.target.value }))} required />
+                            <Input
+                                type="number"
+                                min={0}
+                                max={100}
+                                value={editForm.progress}
+                                onChange={(e) =>
+                                    setEditForm((p) => ({
+                                        ...p,
+                                        progress: e.target.value,
+                                    }))
+                                }
+                                required
+                            />
                         </div>
-                        <SelectField label="Persona" value={editForm.persona} onChange={(e) => setEditForm((p) => ({ ...p, persona: e.target.value }))} options={PERSONAS} />
+                        <SelectField
+                            label="Persona"
+                            value={editForm.persona}
+                            onChange={(e) =>
+                                setEditForm((p) => ({
+                                    ...p,
+                                    persona: e.target.value,
+                                }))
+                            }
+                            options={PERSONAS}
+                        />
                         <div className="flex flex-col gap-1.5 flex-1">
                             <Label>Date finished</Label>
-                            <Input type="date" value={editForm.date} onChange={(e) => setEditForm((p) => ({ ...p, date: e.target.value }))} />
+                            <Input
+                                type="date"
+                                value={editForm.date}
+                                onChange={(e) =>
+                                    setEditForm((p) => ({
+                                        ...p,
+                                        date: e.target.value,
+                                    }))
+                                }
+                            />
                         </div>
                     </div>
 
                     <div className="flex flex-col gap-1.5">
                         <Label>Cover URL</Label>
-                        <Input value={editForm.cover} onChange={(e) => setEditForm((p) => ({ ...p, cover: e.target.value }))} placeholder="https://…" />
+                        <Input
+                            value={editForm.cover}
+                            onChange={(e) =>
+                                setEditForm((p) => ({
+                                    ...p,
+                                    cover: e.target.value,
+                                }))
+                            }
+                            placeholder="https://…"
+                        />
                     </div>
 
                     <div className="flex flex-col gap-1.5">
                         <Label>Thoughts</Label>
-                        <Input value={editForm.thoughts} onChange={(e) => setEditForm((p) => ({ ...p, thoughts: e.target.value }))} placeholder="One-line take…" />
+                        <Input
+                            value={editForm.thoughts}
+                            onChange={(e) =>
+                                setEditForm((p) => ({
+                                    ...p,
+                                    thoughts: e.target.value,
+                                }))
+                            }
+                            placeholder="One-line take…"
+                        />
                     </div>
 
                     <div className="flex flex-col gap-1.5">
@@ -300,22 +491,44 @@ export default function Books() {
                             className="h-9 w-full rounded-md border border-input bg-input/30 px-3 py-1 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 placeholder:text-muted-foreground"
                             placeholder="— None —"
                             value={editForm.article}
-                            onChange={(e) => setEditForm((p) => ({ ...p, article: e.target.value }))}
+                            onChange={(e) =>
+                                setEditForm((p) => ({
+                                    ...p,
+                                    article: e.target.value,
+                                }))
+                            }
                         />
                         <datalist id="article-slugs">
                             {articles.map((a) => (
-                                <option key={a._id} value={`/articles/${a.slug}`}>{a.title}</option>
+                                <option
+                                    key={a._id}
+                                    value={`/articles/${a.slug}`}
+                                >
+                                    {a.title}
+                                </option>
                             ))}
                         </datalist>
                     </div>
 
-                    {error && <p className="text-sm text-destructive">{error}</p>}
+                    {error && (
+                        <p className="text-sm text-destructive">{error}</p>
+                    )}
 
                     <div className="flex gap-3">
-                        <Button type="submit" className="bg-pop-text text-background hover:bg-pop-text/90 font-semibold" disabled={saving}>
+                        <Button
+                            type="submit"
+                            className="bg-pop-text text-background hover:bg-pop-text/90 font-semibold"
+                            disabled={saving}
+                        >
                             {saving ? "Saving…" : "Save"}
                         </Button>
-                        <Button type="button" variant="outline" onClick={handleEditCancel}>Cancel</Button>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={handleEditCancel}
+                        >
+                            Cancel
+                        </Button>
                     </div>
                 </form>
             )}
@@ -334,20 +547,46 @@ export default function Books() {
                 </TableHeader>
                 <TableBody>
                     {books.map((b) => (
-                        <TableRow key={b._id} className={editingBook?._id === b._id ? "bg-secondary/30" : ""}>
+                        <TableRow
+                            key={b._id}
+                            className={
+                                editingBook?._id === b._id
+                                    ? "bg-secondary/30"
+                                    : ""
+                            }
+                        >
                             <TableCell>
-                                {b.cover
-                                    ? <img src={b.cover} alt="" className="w-8 h-11 object-cover rounded-sm bg-muted" />
-                                    : <div className="w-8 h-11 rounded-sm bg-muted" />
-                                }
+                                {b.cover ? (
+                                    <img
+                                        src={b.cover}
+                                        alt=""
+                                        className="w-8 h-11 object-cover rounded-sm bg-muted"
+                                    />
+                                ) : (
+                                    <div className="w-8 h-11 rounded-sm bg-muted" />
+                                )}
                             </TableCell>
-                            <TableCell className="font-medium">{b.title}</TableCell>
-                            <TableCell className="text-muted-foreground">{b.author}</TableCell>
-                            <TableCell className="text-muted-foreground">{b.progress}%</TableCell>
-                            <TableCell className="text-muted-foreground">{b.persona ?? "—"}</TableCell>
+                            <TableCell className="font-medium whitespace-normal">
+                                {b.title}
+                            </TableCell>
+                            <TableCell className="text-muted-foreground">
+                                {b.author}
+                            </TableCell>
+                            <TableCell className="text-muted-foreground">
+                                {b.progress}%
+                            </TableCell>
+                            <TableCell className="text-muted-foreground">
+                                {b.persona ?? "—"}
+                            </TableCell>
                             <TableCell>
                                 <div className="flex gap-2">
-                                    <Button variant="outline" size="sm" onClick={() => handleEdit(b)}>Edit</Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handleEdit(b)}
+                                    >
+                                        Edit
+                                    </Button>
                                     <Button
                                         variant="outline"
                                         size="sm"

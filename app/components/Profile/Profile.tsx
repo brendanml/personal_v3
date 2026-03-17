@@ -16,15 +16,12 @@ const Profile = ({ profile }: { profile: ProfileType | null }) => {
         const experience = document.getElementById("experience")
         if (!topSection || !experience) return
 
-        // Sticky — release when top-section scrolls away
         const stickyObserver = new IntersectionObserver(
             ([entry]) => setSticky(entry.isIntersecting),
             { threshold: 0 },
         )
         stickyObserver.observe(topSection)
 
-        // Section indicator — scroll listener with a detection line that
-        // shifts from 30% → 70% of the viewport as you scroll through experience
         const sectionEls = Array.from(
             experience.querySelectorAll<HTMLElement>("[data-section-label]"),
         )
@@ -88,7 +85,7 @@ const Profile = ({ profile }: { profile: ProfileType | null }) => {
                             <a
                                 key={id}
                                 href={`#${id}`}
-                                className="flex items-center gap-3"
+                                className="flex items-center gap-3 w-fit"
                                 onClick={(e) => {
                                     e.preventDefault()
                                     document

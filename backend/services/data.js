@@ -6,10 +6,7 @@ const Profile = require("../models/Profile")
 
 async function getBooks() {
     const books = await Book.find({}).lean()
-    return books.map((book) => ({
-        ...book,
-        title: book.title.length > 35 ? book.title.slice(0, 35) + "…" : book.title,
-    }))
+    return books
 }
 
 async function getJobs() {
@@ -29,16 +26,19 @@ async function getProfile() {
 }
 
 async function getFullName() {
-    const profile = await Profile.findOne({}, { firstName: 1, middleName: 1, lastName: 1 }).lean()
+    const profile = await Profile.findOne(
+        {},
+        { firstName: 1, middleName: 1, lastName: 1 },
+    ).lean()
     return `${profile.firstName} ${profile.middleName} ${profile.lastName}`
 }
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
 const formatMonth = (iso) =>
-    new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" })
+    new Date(iso).toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC",
+    })
 
 const displayDate = (startDate, endDate) => {
     const start = formatMonth(startDate)
@@ -46,10 +46,6 @@ const displayDate = (startDate, endDate) => {
     const end = formatMonth(endDate)
     return start === end ? start : `${start} – ${end}`
 }
-
-// ---------------------------------------------------------------------------
-// Experience sections
-// ---------------------------------------------------------------------------
 
 const sectionBuilders = {
     work: async () => {
@@ -80,7 +76,10 @@ const sectionBuilders = {
                     title: profile.school.name,
                     subtitle: profile.school.degree,
                     url: profile.school.url,
-                    date: displayDate(profile.school.startDate, profile.school.endDate),
+                    date: displayDate(
+                        profile.school.startDate,
+                        profile.school.endDate,
+                    ),
                     tags: profile.school.courses,
                 },
             ],
@@ -103,7 +102,9 @@ const sectionBuilders = {
                 importance: proj.importance,
                 links: [
                     proj.github ? { label: "GitHub", url: proj.github } : null,
-                    proj.youtube ? { label: "YouTube", url: proj.youtube } : null,
+                    proj.youtube
+                        ? { label: "YouTube", url: proj.youtube }
+                        : null,
                     proj.blog ? { label: "Blog", url: proj.blog } : null,
                 ].filter(Boolean),
             })),
@@ -130,11 +131,11 @@ const sectionBuilders = {
 }
 
 /**
- * @param {Array<"work"|"education"|"projects"|"certifications">} [sections] - defaults to all
+ * @param {Array<"work"|"education"|"projects"|"certifications">} [sections]
  */
 async function getExperiences(sections = Object.keys(sectionBuilders)) {
     const results = await Promise.all(
-        sections.map((key) => sectionBuilders[key]?.())
+        sections.map((key) => sectionBuilders[key]?.()),
     )
     return results.filter((s) => s && s.entries.length > 0)
 }

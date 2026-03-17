@@ -32,10 +32,6 @@ export async function deleteArticle(id) {
     await fetch(`${BASE}/articles/${id}`, { method: "DELETE" })
 }
 
-// ---------------------------------------------------------------------------
-// ArticleType
-// ---------------------------------------------------------------------------
-
 export async function getArticleTypes() {
     const res = await fetch(`${BASE}/article-types`)
     return res.json()
@@ -58,10 +54,6 @@ export async function cleanArticleTags() {
     const res = await fetch(`${BASE}/article-types/clean`, { method: "POST" })
     return res.json()
 }
-
-// ---------------------------------------------------------------------------
-// Books (for article book selector)
-// ---------------------------------------------------------------------------
 
 export async function getBooks() {
     const res = await fetch(`${BASE}/books`)

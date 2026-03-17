@@ -2,10 +2,6 @@ import mongoose, { Schema, model, type Model } from "mongoose"
 import { connectDB } from "~/lib/db.server"
 import type { Profile, Socials, ExperienceSection, Book } from "~/types"
 
-// ---------------------------------------------------------------------------
-// Models — safe to call repeatedly across hot reloads
-// ---------------------------------------------------------------------------
-
 function getModel<T>(name: string, schema: Schema): Model<T> {
     return (mongoose.models[name] as Model<T>) ?? model<T>(name, schema)
 }
@@ -53,10 +49,6 @@ const ProfileModel = getModel("Profile", new Schema({
     },
 }))
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
 const formatMonth = (iso: string) =>
     new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" })
 
@@ -67,17 +59,9 @@ const displayDate = (startDate: string, endDate: string | null) => {
     return start === end ? start : `${start} – ${end}`
 }
 
-// ---------------------------------------------------------------------------
-// Getters
-// ---------------------------------------------------------------------------
-
 export async function getBooks(): Promise<Book[]> {
     await connectDB()
-    const books = await BookModel.find({}).sort({ date: -1, title: 1 }).lean() as unknown as Book[]
-    return books.map((book) => ({
-        ...book,
-        title: book.title && book.title.length > 35 ? book.title.slice(0, 35) + "…" : book.title,
-    }))
+    return BookModel.find({}).sort({ date: -1, title: 1 }).lean() as unknown as Book[]
 }
 
 export async function getJobs() {
@@ -99,17 +83,6 @@ export async function getProfile(): Promise<Profile & { socials: Socials } | nul
     await connectDB()
     return ProfileModel.findOne({}).lean() as unknown as Profile & { socials: Socials } | null
 }
-
-export async function getFullName() {
-    await connectDB()
-    const p = await ProfileModel.findOne({}, { firstName: 1, middleName: 1, lastName: 1 }).lean()
-    if (!p) return ""
-    return `${p.firstName} ${p.middleName} ${p.lastName}`
-}
-
-// ---------------------------------------------------------------------------
-// Experiences
-// ---------------------------------------------------------------------------
 
 type SectionKey = "work" | "education" | "projects" | "certifications"
 
@@ -194,10 +167,6 @@ export async function getExperiences(sections: SectionKey[] = ["work", "educatio
     return results.filter(Boolean) as ExperienceSection[]
 }
 
-// ---------------------------------------------------------------------------
-// Articles
-// ---------------------------------------------------------------------------
-
 export type ArticleMeta = {
     _id: string
     slug: string
@@ -208,8 +177,6 @@ export type ArticleMeta = {
     thumbnail?: string
     published: boolean
 }
-
-export type ArticleDoc = ArticleMeta & { content: string }
 
 function parseReadTime(content: string): string {
     const lines = content.split("\n").filter((l) => l.trim().length > 0).length
@@ -249,52 +216,4 @@ export async function getArticle(slug: string): Promise<(ArticleMeta & { html: s
         published: a.published as boolean,
         html: marked(content) as string,
     }
-}
-
-export async function createArticle(data: {
-    title: string
-    slug: string
-    content: string
-    date: string
-    tags: string[]
-    thumbnail?: string
-    published: boolean
-}) {
-    await connectDB()
-    return ArticleModel.create(data)
-}
-
-export async function getArticleForEdit(slug: string): Promise<ArticleDoc | null> {
-    await connectDB()
-    const a = await ArticleModel.findOne({ slug }).lean()
-    if (!a) return null
-    const content = (a.content ?? "") as string
-    return {
-        _id: String(a._id),
-        slug: a.slug as string,
-        title: a.title as string,
-        date: a.date as string,
-        tags: (a.tags ?? []) as string[],
-        readTime: parseReadTime(content),
-        thumbnail: a.thumbnail as string | undefined,
-        published: a.published as boolean,
-        content,
-    }
-}
-
-export async function deleteArticle(slug: string) {
-    await connectDB()
-    return ArticleModel.findOneAndDelete({ slug })
-}
-
-export async function updateArticle(slug: string, data: {
-    title: string
-    content: string
-    date: string
-    tags: string[]
-    thumbnail?: string
-    published: boolean
-}) {
-    await connectDB()
-    return ArticleModel.findOneAndUpdate({ slug }, data, { new: true })
 }

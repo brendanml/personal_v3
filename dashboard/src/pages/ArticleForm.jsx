@@ -1,16 +1,38 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { getArticle, createArticle, updateArticle, getArticleTypes, createArticleType, deleteArticleType, getBooks, updateBook } from "../api"
+import {
+    getArticle,
+    createArticle,
+    updateArticle,
+    getArticleTypes,
+    createArticleType,
+    deleteArticleType,
+    getBooks,
+    updateBook,
+} from "../api"
 import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
 import { Label } from "../components/ui/label"
 import { Textarea } from "../components/ui/textarea"
 import { cn } from "../lib/utils"
 
-const empty = { title: "", slug: "", date: "", tags: [], thumbnail: "", content: "", published: false, book: "" }
+const empty = {
+    title: "",
+    slug: "",
+    date: "",
+    tags: [],
+    thumbnail: "",
+    content: "",
+    published: false,
+    book: "",
+}
 
 function slugify(str) {
-    return str.toLowerCase().replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-")
+    return str
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .trim()
+        .replace(/\s+/g, "-")
 }
 
 export default function ArticleForm() {
@@ -62,7 +84,9 @@ export default function ArticleForm() {
         if (!name) return
         const created = await createArticleType(name)
         if (!created.error) {
-            setArticleTypes((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)))
+            setArticleTypes((prev) =>
+                [...prev, created].sort((a, b) => a.name.localeCompare(b.name)),
+            )
             setNewTypeName("")
         }
     }
@@ -71,7 +95,10 @@ export default function ArticleForm() {
         if (!confirm(`Delete type "${name}"?`)) return
         await deleteArticleType(typeId)
         setArticleTypes((prev) => prev.filter((t) => t._id !== typeId))
-        setForm((prev) => ({ ...prev, tags: prev.tags.filter((t) => t !== name) }))
+        setForm((prev) => ({
+            ...prev,
+            tags: prev.tags.filter((t) => t !== name),
+        }))
     }
 
     async function handleSubmit(e) {
@@ -91,12 +118,13 @@ export default function ArticleForm() {
                 await createArticle(payload)
             }
 
-            // Sync Book.article links
             if (originalBook && originalBook !== form.book) {
                 await updateBook(originalBook, { article: "" })
             }
             if (form.book) {
-                await updateBook(form.book, { article: `/articles/${form.slug}` })
+                await updateBook(form.book, {
+                    article: `/articles/${form.slug}`,
+                })
             }
 
             navigate("/articles")
@@ -113,18 +141,30 @@ export default function ArticleForm() {
                 <a
                     href="/articles"
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                    onClick={(e) => { e.preventDefault(); navigate("/articles") }}
+                    onClick={(e) => {
+                        e.preventDefault()
+                        navigate("/articles")
+                    }}
                 >
                     ← Articles
                 </a>
-                <h1 className="text-xl font-semibold m-0">{isEdit ? "Edit article" : "New article"}</h1>
+                <h1 className="text-xl font-semibold m-0">
+                    {isEdit ? "Edit article" : "New article"}
+                </h1>
             </div>
 
-            <form className="flex flex-col gap-5 max-w-2xl" onSubmit={handleSubmit}>
+            <form
+                className="flex flex-col gap-5 max-w-2xl"
+                onSubmit={handleSubmit}
+            >
                 <div className="flex gap-4">
                     <div className="flex flex-col gap-1.5 flex-1">
                         <Label>Title</Label>
-                        <Input value={form.title} onChange={(e) => set("title", e.target.value)} required />
+                        <Input
+                            value={form.title}
+                            onChange={(e) => set("title", e.target.value)}
+                            required
+                        />
                     </div>
                 </div>
 
@@ -133,14 +173,21 @@ export default function ArticleForm() {
                         <Label>Slug</Label>
                         <Input
                             value={form.slug}
-                            onChange={(e) => { setSlugTouched(true); set("slug", e.target.value) }}
+                            onChange={(e) => {
+                                setSlugTouched(true)
+                                set("slug", e.target.value)
+                            }}
                             readOnly={isEdit}
                             required
                         />
                     </div>
                     <div className="flex flex-col gap-1.5 flex-1">
                         <Label>Date</Label>
-                        <Input type="date" value={form.date} onChange={(e) => set("date", e.target.value)} />
+                        <Input
+                            type="date"
+                            value={form.date}
+                            onChange={(e) => set("date", e.target.value)}
+                        />
                     </div>
                 </div>
 
@@ -155,7 +202,7 @@ export default function ArticleForm() {
                                         "inline-flex items-center gap-1 px-2.5 py-1 rounded border text-sm cursor-pointer select-none transition-colors",
                                         form.tags.includes(t.name)
                                             ? "bg-pop/20 border-pop-text text-pop-text"
-                                            : "border-border bg-secondary text-foreground hover:bg-secondary/80"
+                                            : "border-border bg-secondary text-foreground hover:bg-secondary/80",
                                     )}
                                     onClick={() => toggleTag(t.name)}
                                 >
@@ -163,7 +210,10 @@ export default function ArticleForm() {
                                     <button
                                         type="button"
                                         className="text-destructive hover:text-destructive/80 text-xs leading-none"
-                                        onClick={(e) => { e.stopPropagation(); handleDeleteType(t._id, t.name) }}
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleDeleteType(t._id, t.name)
+                                        }}
                                         title="Delete type"
                                     >
                                         ×
@@ -177,7 +227,12 @@ export default function ArticleForm() {
                                 placeholder="New type (e.g. Electronics)"
                                 value={newTypeName}
                                 onChange={(e) => setNewTypeName(e.target.value)}
-                                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleAddType() } }}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        e.preventDefault()
+                                        handleAddType()
+                                    }
+                                }}
                             />
                             <Button
                                 type="button"
@@ -192,7 +247,11 @@ export default function ArticleForm() {
 
                     <div className="flex flex-col gap-1.5 flex-1">
                         <Label>Thumbnail URL</Label>
-                        <Input value={form.thumbnail ?? ""} onChange={(e) => set("thumbnail", e.target.value)} placeholder="https://..." />
+                        <Input
+                            value={form.thumbnail ?? ""}
+                            onChange={(e) => set("thumbnail", e.target.value)}
+                            placeholder="https://..."
+                        />
                     </div>
                 </div>
 
@@ -206,7 +265,9 @@ export default function ArticleForm() {
                         >
                             <option value="">— None —</option>
                             {books.map((b) => (
-                                <option key={b._id} value={b._id}>{b.title}</option>
+                                <option key={b._id} value={b._id}>
+                                    {b.title}
+                                </option>
                             ))}
                         </select>
                     </div>

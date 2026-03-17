@@ -103,9 +103,9 @@ export default function Books() {
                                     </div>
                                 </TableCell>
                                 {/* mobile: short title + article */}
-                                <TableCell className="md:hidden font-medium">
+                                <TableCell className="md:hidden font-medium whitespace-normal">
                                     <div className="flex flex-col gap-0.5">
-                                        <span>{book.shortTitle}</span>
+                                        <span>{book.title}</span>
                                         {book.article && (
                                             <Link
                                                 to={book.article}
@@ -117,7 +117,7 @@ export default function Books() {
                                     </div>
                                 </TableCell>
                                 {/* desktop: full title */}
-                                <TableCell className="hidden md:table-cell font-medium">
+                                <TableCell className="hidden md:table-cell font-medium whitespace-normal w-80">
                                     {book.title}
                                 </TableCell>
                                 <TableCell className="hidden md:table-cell text-muted-foreground">

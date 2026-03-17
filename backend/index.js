@@ -23,7 +23,6 @@ const MONGODB_URI =
 
 app.use(express.json())
 
-// Allow local dashboard (Vite dev server)
 app.use((req, res, next) => {
     const origin = req.headers.origin
     if (origin && origin.startsWith("http://localhost")) {
@@ -38,10 +37,6 @@ app.use((req, res, next) => {
     next()
 })
 
-// ---------------------------------------------------------------------------
-// Public read routes
-// ---------------------------------------------------------------------------
-
 app.get("/books", async (req, res) => {
     const books = await getBooks()
     res.json(books)
@@ -51,13 +46,17 @@ app.get("/books/search", async (req, res) => {
     const q = req.query.q?.trim()
     if (!q) return res.json([])
     try {
-        const key = process.env.GOOGLE_BOOKS_API_KEY ? `&key=${process.env.GOOGLE_BOOKS_API_KEY}` : ""
+        const key = process.env.GOOGLE_BOOKS_API_KEY
+            ? `&key=${process.env.GOOGLE_BOOKS_API_KEY}`
+            : ""
         const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=10&printType=books${key}`
         const response = await fetch(url)
         const data = await response.json()
         const results = (data.items ?? []).map((item) => {
             const info = item.volumeInfo
-            const cover = info.imageLinks?.thumbnail?.replace("http://", "https://") ?? null
+            const cover =
+                info.imageLinks?.thumbnail?.replace("http://", "https://") ??
+                null
             return {
                 olKey: item.id,
                 title: info.title,
@@ -125,10 +124,6 @@ app.get("/experiences", async (req, res) => {
     res.json(experiences)
 })
 
-// ---------------------------------------------------------------------------
-// Book update route (dashboard)
-// ---------------------------------------------------------------------------
-
 app.put("/books/:id", async (req, res) => {
     try {
         const book = await Book.findByIdAndUpdate(req.params.id, req.body, {
@@ -142,10 +137,6 @@ app.put("/books/:id", async (req, res) => {
     }
 })
 
-// ---------------------------------------------------------------------------
-// ArticleType routes (dashboard)
-// ---------------------------------------------------------------------------
-
 app.get("/article-types", async (req, res) => {
     const types = await ArticleType.find({}).sort({ name: 1 }).lean()
     res.json(types)
@@ -155,7 +146,10 @@ app.post("/article-types/clean", async (req, res) => {
     try {
         const types = await ArticleType.find({}, { name: 1 }).lean()
         const validNames = new Set(types.map((t) => t.name))
-        const articles = await Article.find({ tags: { $exists: true, $not: { $size: 0 } } }, { tags: 1 }).lean()
+        const articles = await Article.find(
+            { tags: { $exists: true, $not: { $size: 0 } } },
+            { tags: 1 },
+        ).lean()
         let cleaned = 0
         for (const article of articles) {
             const filtered = article.tags.filter((tag) => validNames.has(tag))
@@ -183,16 +177,15 @@ app.delete("/article-types/:id", async (req, res) => {
     try {
         const type = await ArticleType.findByIdAndDelete(req.params.id)
         if (!type) return res.status(404).json({ error: "Not found" })
-        await Article.updateMany({ tags: type.name }, { $pull: { tags: type.name } })
+        await Article.updateMany(
+            { tags: type.name },
+            { $pull: { tags: type.name } },
+        )
         res.status(204).end()
     } catch (err) {
         res.status(400).json({ error: err.message })
     }
 })
-
-// ---------------------------------------------------------------------------
-// Article routes (dashboard)
-// ---------------------------------------------------------------------------
 
 app.get("/articles", async (req, res) => {
     const articles = await Article.find({}).sort({ date: -1 }).lean()
@@ -240,10 +233,6 @@ app.delete("/articles/:id", async (req, res) => {
         res.status(400).json({ error: err.message })
     }
 })
-
-// ---------------------------------------------------------------------------
-// Start
-// ---------------------------------------------------------------------------
 
 mongoose
     .connect(MONGODB_URI)
