@@ -5,7 +5,12 @@ import LightModeIcon from "@mui/icons-material/LightMode"
 import MenuIcon from "@mui/icons-material/Menu"
 import { Button } from "~/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "~/components/ui/sheet"
-import { glassBaseStyles, glassStyles, glassInactiveStyles, glassClickable } from "~/lib/styles"
+import {
+    glassBaseStyles,
+    glassStyles,
+    glassInactiveStyles,
+    glassClickable,
+} from "~/lib/styles"
 import FixedContentRow from "~/components/FixedContentRow"
 import { navLinksFor, type NavLink } from "~/lib/navLinks"
 
@@ -23,11 +28,12 @@ const DesktopNav = ({ links }: { links: NavLink[] }) => {
 
     return (
         <FixedContentRow
-            className="hidden md:flex top-4"
+            className="hidden md:flex top-0 pt-4"
             innerClassName="justify-end"
         >
+            <div className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-background to-transparent pointer-events-none" />
             <div
-                className={`${glassBaseStyles} ${scrolled ? glassStyles : glassInactiveStyles}`}
+                className={`z-10 ${glassBaseStyles} ${scrolled ? glassStyles : glassInactiveStyles}`}
             >
                 {links.map((link) => (
                     <Button

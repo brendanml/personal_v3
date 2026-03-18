@@ -34,14 +34,20 @@ const Profile = ({ profile }: { profile: ProfileType | null }) => {
         )
 
         const onScroll = () => {
-            const expRect = experience.getBoundingClientRect()
-            const vh = window.innerHeight
-            const progress = Math.max(
-                0,
-                Math.min(1, -expRect.top / (expRect.height - vh)),
-            )
-            const activeLine = vh * (progress < 0.5 ? 0.3 : 0.7)
+            const scrollBottom =
+                window.innerHeight + window.scrollY >=
+                document.body.scrollHeight - 50
 
+            if (scrollBottom) {
+                // At the bottom of the page — activate the last section
+                setActiveSection(
+                    sectionEls.at(-1)?.dataset.sectionLabel ?? null,
+                )
+                return
+            }
+
+            // Otherwise, activate whichever section's top has crossed ~30% of the viewport
+            const activeLine = window.innerHeight * 0.2
             let active: HTMLElement | null = null
             for (const el of sectionEls) {
                 if (el.getBoundingClientRect().top <= activeLine) active = el
