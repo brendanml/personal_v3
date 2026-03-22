@@ -103,7 +103,7 @@ const Profile = ({ profile }: { profile: ProfileType | null }) => {
                                 }}
                             >
                                 <div
-                                    className={`rounded-full shrink-0 transition-all duration-300 ${active ? "w-2 h-2 bg-pop border border-pop-text" : "w-1.5 h-1.5 bg-muted-foreground/30"}`}
+                                    className={`rounded-full shrink-0 transition-all duration-300 ${active ? "w-2 h-2 bg-pop border border-pop-mid" : "w-1.5 h-1.5 bg-muted-foreground/30"}`}
                                 />
                                 <span
                                     className={`text-sm transition-all duration-300 ${!active && "hover:text-foreground"} ${active ? "text-pop-text" : "text-muted-foreground/40"}`}

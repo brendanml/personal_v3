@@ -1,5 +1,5 @@
 export const glassBaseStyles = "pointer-events-auto flex items-center p-1 transition-[background-color,border-color,box-shadow,backdrop-filter] duration-150"
-export const glassStyles = "bg-foreground/10 backdrop-blur-xl border border-border/60 shadow-[0_4px_12px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.1)] rounded-full"
+export const glassStyles = "bg-foreground/5 dark:bg-foreground/10 backdrop-blur-xl border border-border/60 shadow-[0_4px_12px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.1)] rounded-full"
 export const glassInactiveStyles = "bg-transparent backdrop-blur-none border border-transparent shadow-none rounded-full"
 export const glassClickable = "rounded-full"
 export const contentColumnStyles = "w-full max-w-7xl mx-auto px-6 md:px-16"

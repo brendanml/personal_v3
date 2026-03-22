@@ -20,12 +20,14 @@ html {
     --color-accent: var(--accent);
     --color-accent-secondary: var(--accent-secondary);
     --color-pop: var(--pop);
+    --color-pop-mid: var(--pop-mid);
     --color-pop-text: var(--pop-text);
     --color-pop-text-secondary: var(--pop-text-secondary);
 }
 
 :root {
     --pop: oklch(0.88 0.08 165);
+    --pop-mid: oklch(0.62 0.11 160);
     --pop-text: oklch(0.32 0.14 155);
     --pop-text-secondary: oklch(0.42 0.1 162);
     --primary: oklch(24.884% 0.0015 16.221);
@@ -106,6 +108,7 @@ html {
 
 .dark {
     --pop: oklch(0.28 0.09 165);
+    --pop-mid: oklch(0.53 0.10 161);
     --pop-text: oklch(0.78 0.12 158);
     --pop-text-secondary: oklch(0.88 0.08 164);
     --background: oklch(0.145 0 0);
