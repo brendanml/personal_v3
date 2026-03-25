@@ -10,9 +10,13 @@ export default function Footer({ profile }: FooterProps) {
 
     return (
         <footer className="w-full border-t border-border mt-16">
-            <div className={`${contentColumnStyles} py-6 flex justify-between items-center`}>
-                <span className="text-sm font-semibold">{profile?.firstName} {profile?.lastName}</span>
-                <span className="text-sm text-muted-foreground">© {year} {profile?.firstName} {profile?.lastName}</span>
+            <div
+                className={`${contentColumnStyles} py-6 flex justify-between items-center`}
+            >
+                <span className="text-sm font-semibold"></span>
+                <span className="text-sm text-muted-foreground">
+                    © {year} {profile?.firstName} {profile?.lastName}
+                </span>
             </div>
         </footer>
     )
