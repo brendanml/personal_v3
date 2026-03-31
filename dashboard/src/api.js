@@ -119,6 +119,38 @@ export async function deleteProject(id) {
     await fetch(`${BASE}/projects/${id}`, { method: "DELETE" })
 }
 
+export async function getJobs() {
+    const res = await fetch(`${BASE}/jobs`)
+    return res.json()
+}
+
+export async function getJob(id) {
+    const res = await fetch(`${BASE}/jobs/${id}`)
+    return res.json()
+}
+
+export async function createJob(data) {
+    const res = await fetch(`${BASE}/jobs`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+    })
+    return res.json()
+}
+
+export async function updateJob(id, data) {
+    const res = await fetch(`${BASE}/jobs/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+    })
+    return res.json()
+}
+
+export async function deleteJob(id) {
+    await fetch(`${BASE}/jobs/${id}`, { method: "DELETE" })
+}
+
 export async function getProfile() {
     const res = await fetch(`${BASE}/profile`)
     return res.json()

@@ -71,7 +71,7 @@ export async function getJobs() {
 
 export async function getProjects() {
     await connectDB()
-    return ProjectModel.find({ importance: { $in: ["high", "medium"] } }).lean()
+    return ProjectModel.find({ importance: { $in: ["high", "medium"] } }).sort({ startDate: -1 }).lean()
 }
 
 export async function getCertifications() {

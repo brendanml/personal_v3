@@ -5,6 +5,8 @@ import Tags from "./pages/Tags"
 import Books from "./pages/Books"
 import Projects from "./pages/Projects"
 import ProjectForm from "./pages/ProjectForm"
+import Jobs from "./pages/Jobs"
+import JobForm from "./pages/JobForm"
 import Profile from "./pages/Profile"
 import { cn } from "./lib/utils"
 
@@ -83,6 +85,19 @@ export default function App() {
                 >
                     Projects
                 </NavLink>
+                <NavLink
+                    to="/jobs"
+                    className={({ isActive }) =>
+                        cn(
+                            "block px-2.5 py-1.5 rounded-md text-sm transition-colors",
+                            isActive
+                                ? "bg-secondary text-foreground"
+                                : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                        )
+                    }
+                >
+                    Work Experience
+                </NavLink>
             </aside>
             <main className="flex-1 p-8">
                 <Routes>
@@ -95,6 +110,9 @@ export default function App() {
                     <Route path="/projects" element={<Projects />} />
                     <Route path="/projects/new" element={<ProjectForm />} />
                     <Route path="/projects/:id/edit" element={<ProjectForm />} />
+                    <Route path="/jobs" element={<Jobs />} />
+                    <Route path="/jobs/new" element={<JobForm />} />
+                    <Route path="/jobs/:id/edit" element={<JobForm />} />
                     <Route path="/profile" element={<Profile />} />
                 </Routes>
             </main>

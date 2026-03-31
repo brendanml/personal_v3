@@ -15,6 +15,7 @@ const {
 const Article = require("./models/Article")
 const ArticleType = require("./models/ArticleType")
 const Book = require("./models/Book")
+const Job = require("./models/Job")
 const Project = require("./models/Project")
 const Profile = require("./models/Profile")
 
@@ -93,8 +94,46 @@ app.delete("/books/:id", async (req, res) => {
 })
 
 app.get("/jobs", async (req, res) => {
-    const jobs = await getJobs()
+    const jobs = await Job.find({}).sort({ startDate: -1 }).lean()
     res.json(jobs)
+})
+
+app.get("/jobs/:id", async (req, res) => {
+    const job = await Job.findById(req.params.id).lean()
+    if (!job) return res.status(404).json({ error: "Not found" })
+    res.json(job)
+})
+
+app.post("/jobs", async (req, res) => {
+    try {
+        const job = await Job.create(req.body)
+        res.status(201).json(job)
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
+
+app.put("/jobs/:id", async (req, res) => {
+    try {
+        const job = await Job.findByIdAndUpdate(req.params.id, req.body, {
+            returnDocument: "after",
+            runValidators: true,
+        })
+        if (!job) return res.status(404).json({ error: "Not found" })
+        res.json(job)
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
+
+app.delete("/jobs/:id", async (req, res) => {
+    try {
+        const job = await Job.findByIdAndDelete(req.params.id)
+        if (!job) return res.status(404).json({ error: "Not found" })
+        res.status(204).end()
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
 })
 
 app.get("/projects", async (req, res) => {

@@ -11,7 +11,7 @@ import { cardHoverStyles } from "~/lib/styles"
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward"
 
 const ExperienceCard = ({ entry }: { entry: ExperienceEntry }) => (
-    <Card className={`group ${cardHoverStyles}`}>
+    <Card className={`group ${cardHoverStyles} gap-3`}>
         <CardHeader>
             <div className="flex items-start justify-between">
                 <CardTitle className="leading-snug">
